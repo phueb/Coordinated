@@ -47,11 +47,15 @@ class Params(object):
 
 
 def main(param2val=None):
+
+    if param2val is None:  # if running in IDE
+        save_path = Path('saves')
+    else:
+        save_path = Path(param2val['save_path'])
+
     # this allows running main() directly in IDE instead of terminal which does not show figures by default
     if param2val is None:
         param2val = {
-            'save_path': 'debugging',
-
             # rnn
             'flavor': 'srn',
             # toy corpus
@@ -76,8 +80,6 @@ def main(param2val=None):
     # params
     params = Params.from_param2val(param2val)
     print(params, flush=True)
-
-    save_path = Path(param2val['save_path'])
 
     # create toy input
     corpus = Corpus(doc_size=params.doc_size,
@@ -153,11 +155,11 @@ def main(param2val=None):
         last_encodings = rnn(inputs)
         mse = criterion(last_encodings, targets)  # MSE not XE
 
-        # EVAL
+        # EVAL /////////////////////////////////////////////////////////////////////////
+
+        # collect mse
         if step % configs.Eval.eval_interval == 0:
             eval_steps.append(step)
-
-            # collect mse
             mse_npy = mse.detach().cpu().numpy().item()
             name2col.setdefault('mse', []).append(mse_npy)
 
@@ -167,11 +169,11 @@ def main(param2val=None):
 
         # visualize hidden states + embeddings
         if step % configs.Eval.plot_interval == 0:
-            save_path.mkdir(parents=True, exist_ok=True)
+
             slot2hiddens = {}
             slot2embeddings = {}
             for slot, words in zip(corpus.slots,
-                                   [corpus.a, corpus.b, corpus.x, corpus.y]):
+                                   [corpus.a, corpus.x, corpus.b, corpus.y]):
                 word_ids = [prep.store.w2id[w] for w in words]
 
                 # compute embeddings
@@ -195,13 +197,17 @@ def main(param2val=None):
             fig_e = make_scatter_plot(slot2embeddings, 'embeddings', step, cat_id2coordinate)
             fig_h = make_scatter_plot(slot2hiddens, 'hidden states', step, cat_id2coordinate)
 
+            fig_e.savefig(save_path / 'embeddings' / f'{step}.png')
+            fig_h.savefig(save_path / 'hiddens' / f'{step}.png')
+
             if configs.Fig.show_embeddings:
                 fig_e.show()
 
             if configs.Fig.show_hiddens:
                 fig_h.show()
 
-        # TRAIN
+        # TRAIN /////////////////////////////////////////////////////////////////////////
+
         mse.backward()
         optimizer.step()
 
@@ -217,4 +223,6 @@ def main(param2val=None):
 
 
 if __name__ == '__main__':
+    (Path('saves') / 'embeddings').mkdir(parents=True, exist_ok=True)
+    (Path('saves') / 'hiddens').mkdir(parents=True, exist_ok=True)
     main()
