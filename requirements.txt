@@ -1,0 +1,8 @@
+numpy
+matplotlib
+torch==1.4.0
+cached_property
+pandas
+attrs
+https://github.com/phueb/Preppy/archive/v2.0.0.tar.gz
+https://github.com/phueb/Ludwig/archive/v2.1.2.tar.gz
