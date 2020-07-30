@@ -15,7 +15,6 @@ class Eval:
     verbose = False
     eval_interval = 100
     plot_interval = 100
-    save_embeddings = False
 
 
 class Fig:
@@ -26,5 +25,6 @@ class Fig:
     dpi = 163 // 2
     line_width = 2
 
-    show_embeddings = 1
-    show_hiddens = 0
+    show_embeddings = 0
+    show_hiddens1 = 0
+    show_hiddens2 = 1

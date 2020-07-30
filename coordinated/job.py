@@ -55,27 +55,7 @@ def main(param2val=None):
 
     # this allows running main() directly in IDE instead of terminal which does not show figures by default
     if param2val is None:
-        param2val = {
-            # rnn
-            'flavor': 'srn',
-            # toy corpus
-            'doc_size': 200_000,
-            'delay': 100_000,
-            'num_types': 128,
-            'starvation': (0.0, 0.0),  # (prob before delay, prob after delay)
-            'sample_a': ('super', 'super'),
-            'sample_b': ('super', 'super'),
-            'incongruent_a': (0.0, 0.0),  # probability that Ai is category incongruent
-            'incongruent_b': (0.0, 0.0),
-            'size_a': (1.0, 1.0),  # proportion of set size of A
-            'size_b': (1.0, 1.0),
-            'drop_a': (0.0, 0.0),
-            'drop_b': (0.0, 0.0),
-            # training
-            'optimizer': 'sgd',
-            'lr': 0.4,  # 0.01 for adagrad, 0.5 for sgd
-            'batch_size': 64,
-        }
+        param2val = param2val_ide
 
     # params
     params = Params.from_param2val(param2val)
@@ -170,7 +150,8 @@ def main(param2val=None):
         # visualize hidden states + embeddings
         if step % configs.Eval.plot_interval == 0:
 
-            slot2hiddens = {}
+            slot2hiddens1 = {}
+            slot2hiddens2 = {}
             slot2embeddings = {}
             for slot, words in zip(corpus.slots,
                                    [corpus.a, corpus.x, corpus.b, corpus.y]):
@@ -180,31 +161,33 @@ def main(param2val=None):
                 embeddings = rnn.embed.weight.detach().cpu().numpy()[word_ids]
                 slot2embeddings[slot] = embeddings
 
-                # compute hiddens
+                # compute hiddens1 - just hidden state for single time step
                 hiddens = rnn(torch.cuda.LongTensor(np.array([word_ids])).T)
-                slot2hiddens[slot] = hiddens.detach().cpu().numpy()
+                slot2hiddens1[slot] = hiddens.detach().cpu().numpy()
 
-                # save embeddings  to file (for making animations)
-                if configs.Eval.save_embeddings:
-                    out_path = save_path / f'embeddings_{step:0>9}_{slot}.npy'
-                    np.save(out_path, embeddings)  # TODO
+            # compute hiddens2 - last hidden state for complete sequence
+            # note:not all possible contexts may be represented in corpus, but close
+            all_unique_contexts = np.unique(prep.reordered_windows[:, :-1], axis=0)
+            hiddens = rnn(torch.cuda.LongTensor(all_unique_contexts))
+            slot2hiddens2['axb'] = hiddens.detach().cpu().numpy()
 
-            # add condition in which all embeddings are added together
-            slot2embeddings['axb'] = slot2embeddings['a'] + \
-                                     slot2embeddings['x'] + \
-                                     slot2embeddings['b']
             # make fig
-            fig_e = make_scatter_plot(slot2embeddings, 'embeddings', step, cat_id2coordinate)
-            fig_h = make_scatter_plot(slot2hiddens, 'hidden states', step, cat_id2coordinate)
+            fig_e1 = make_scatter_plot(slot2embeddings, 'embeddings', step, cat_id2coordinate)
+            fig_h1 = make_scatter_plot(slot2hiddens1, 'hidden states', step, cat_id2coordinate)
+            fig_h2 = make_scatter_plot(slot2hiddens2, 'hidden states', step, cat_id2coordinate)
 
-            fig_e.savefig(save_path / 'embeddings' / f'{step}.png')
-            fig_h.savefig(save_path / 'hiddens' / f'{step}.png')
+            fig_e1.savefig(save_path / 'embeddings' / f'{step}.png')
+            fig_h1.savefig(save_path / 'hiddens1' / f'{step}.png')
+            fig_h2.savefig(save_path / 'hiddens2' / f'{step}.png')
 
             if configs.Fig.show_embeddings:
-                fig_e.show()
+                fig_e1.show()
 
-            if configs.Fig.show_hiddens:
-                fig_h.show()
+            if configs.Fig.show_hiddens1:
+                fig_h1.show()
+
+            if configs.Fig.show_hiddens2:
+                fig_h2.show()
 
         # TRAIN /////////////////////////////////////////////////////////////////////////
 
@@ -224,5 +207,29 @@ def main(param2val=None):
 
 if __name__ == '__main__':
     (Path('saves') / 'embeddings').mkdir(parents=True, exist_ok=True)
-    (Path('saves') / 'hiddens').mkdir(parents=True, exist_ok=True)
+    (Path('saves') / 'hiddens1').mkdir(parents=True, exist_ok=True)
+    (Path('saves') / 'hiddens2').mkdir(parents=True, exist_ok=True)
+
+    param2val_ide = {
+            # rnn
+            'flavor': 'srn',
+            # toy corpus
+            'doc_size': 200_000,
+            'delay': 100_000,
+            'num_types': 128,
+            'starvation': (0.0, 0.0),  # (prob before delay, prob after delay)
+            'sample_a': ('super', 'super'),
+            'sample_b': ('super', 'super'),
+            'incongruent_a': (0.0, 0.0),  # probability that Ai is category incongruent
+            'incongruent_b': (0.0, 0.0),
+            'size_a': (1.0, 1.0),  # proportion of set size of A
+            'size_b': (1.0, 1.0),
+            'drop_a': (0.0, 0.0),
+            'drop_b': (0.0, 0.0),
+            # training
+            'optimizer': 'sgd',
+            'lr': 0.4,  # 0.01 for adagrad, 0.5 for sgd
+            'batch_size': 64,
+        }
+
     main()
