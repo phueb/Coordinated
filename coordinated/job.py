@@ -84,16 +84,20 @@ def main(param2val=None):
                        context_size=corpus.num_words_in_window - 1)
 
     # pre compute unique windows
-    all_unique_contexts, counts = np.unique(prep.reordered_windows[:, :-1], axis=0, return_counts=True)
+    all_contexts = prep.reordered_windows[:, :-1]
+    b_ids = [prep.store.w2id[w] for w in corpus.b]
+    bool_ids = np.isin(all_contexts[:, -1], b_ids)
+    all_contexts_ending_in_b = all_contexts[bool_ids]
+    all_unique_contexts_ending_in_b, counts = np.unique(all_contexts_ending_in_b, axis=0, return_counts=True)
     print('stats about window counts')
     print(counts.min())
     print(counts.mean())
     print(counts.max())
 
-    unique_contexts_all = all_unique_contexts  # all sequences
-    unique_contexts_hf = all_unique_contexts[np.where(counts >= configs.Eval.hf_threshold)[0]]  # only high-frequency
-    print(len(unique_contexts_all))
-    print(len(unique_contexts_hf))
+    unique_contexts_ending_in_b_all = all_unique_contexts_ending_in_b
+    unique_contexts_ending_in_b_hf = all_unique_contexts_ending_in_b[np.where(counts >= configs.Eval.hf_threshold)[0]]
+    print(f'num sequences all={len(unique_contexts_ending_in_b_all):,}')
+    print(f'num sequences hf ={len(unique_contexts_ending_in_b_hf):,}')
 
     # define 3 locations in 2d space equidistant from one another and from origin
     cat_id2coordinate = {
@@ -179,9 +183,9 @@ def main(param2val=None):
 
             # compute hiddens2 - last hidden state for complete sequence
             # note:not all possible contexts may be represented in corpus, but close
-            hiddens = rnn(torch.cuda.LongTensor(unique_contexts_all))
+            hiddens = rnn(torch.cuda.LongTensor(unique_contexts_ending_in_b_all))
             slot2hiddens2['axb (all sequences)'] = hiddens.detach().cpu().numpy()
-            hiddens = rnn(torch.cuda.LongTensor(unique_contexts_hf))
+            hiddens = rnn(torch.cuda.LongTensor(unique_contexts_ending_in_b_hf))
             slot2hiddens2['axb (high-frequency only)'] = hiddens.detach().cpu().numpy()
 
             # make fig
@@ -227,9 +231,9 @@ if __name__ == '__main__':
             # rnn
             'flavor': 'srn',
             # toy corpus
-            'doc_size': 200_000,
-            'delay': 100_000,
-            'num_types': 128,
+            'doc_size': 400_000,
+            'delay': 200_000,
+            'num_types': 128 // 1,  # originally 128
             'starvation': (0.0, 0.0),  # (prob before delay, prob after delay)
             'sample_a': ('super', 'super'),
             'sample_b': ('super', 'super'),
@@ -241,7 +245,7 @@ if __name__ == '__main__':
             'drop_b': (0.0, 0.0),
             # training
             'optimizer': 'sgd',
-            'lr': 0.4,
+            'lr': 0.05,
             'batch_size': 64,
         }
 

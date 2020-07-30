@@ -8,7 +8,7 @@ class Dirs:
 
 
 class Training:
-    max_init_weight = 0.1
+    max_init_weight = 0.01
 
 
 class Eval:

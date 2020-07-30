@@ -1,9 +1,6 @@
 
 
 param2requests = {
-    'batch_size': [64],
-    'lr': [0.4],
-
     'incongruent_a': [(1.0, 1.0)],  # , (0.0, 0.0)],
     'incongruent_b': [(1.0, 1.0)],  # , (0.0, 0.0)],
 
@@ -33,6 +30,6 @@ param2default = {
     'drop_b': (0.0, 0.0),
     # training
     'optimizer': 'sgd',
-    'lr': 0.4,  # 0.01 for adagrad, 0.5 for sgd
+    'lr': 0.1,
     'batch_size': 64,
 }
