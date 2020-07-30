@@ -2,7 +2,7 @@
 
 param2requests = {
     'batch_size': [64],
-    'lr': [0.4, 10e-4],
+    'lr': [0.4],
 
     'incongruent_a': [(1.0, 1.0)],  # , (0.0, 0.0)],
     'incongruent_b': [(1.0, 1.0)],  # , (0.0, 0.0)],

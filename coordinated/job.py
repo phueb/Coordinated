@@ -83,6 +83,18 @@ def main(param2val=None):
                        batch_size=params.batch_size,
                        context_size=corpus.num_words_in_window - 1)
 
+    # pre compute unique windows
+    all_unique_contexts, counts = np.unique(prep.reordered_windows[:, :-1], axis=0, return_counts=True)
+    print('stats about window counts')
+    print(counts.min())
+    print(counts.mean())
+    print(counts.max())
+
+    unique_contexts_all = all_unique_contexts  # all sequences
+    unique_contexts_hf = all_unique_contexts[np.where(counts >= configs.Eval.hf_threshold)[0]]  # only high-frequency
+    print(len(unique_contexts_all))
+    print(len(unique_contexts_hf))
+
     # define 3 locations in 2d space equidistant from one another and from origin
     cat_id2coordinate = {
         0: [+1.0, +0.0],
@@ -167,9 +179,10 @@ def main(param2val=None):
 
             # compute hiddens2 - last hidden state for complete sequence
             # note:not all possible contexts may be represented in corpus, but close
-            all_unique_contexts = np.unique(prep.reordered_windows[:, :-1], axis=0)
-            hiddens = rnn(torch.cuda.LongTensor(all_unique_contexts))
-            slot2hiddens2['axb'] = hiddens.detach().cpu().numpy()
+            hiddens = rnn(torch.cuda.LongTensor(unique_contexts_all))
+            slot2hiddens2['axb (all sequences)'] = hiddens.detach().cpu().numpy()
+            hiddens = rnn(torch.cuda.LongTensor(unique_contexts_hf))
+            slot2hiddens2['axb (high-frequency only)'] = hiddens.detach().cpu().numpy()
 
             # make fig
             fig_e1 = make_scatter_plot(slot2embeddings, 'embeddings', step, cat_id2coordinate)
@@ -228,7 +241,7 @@ if __name__ == '__main__':
             'drop_b': (0.0, 0.0),
             # training
             'optimizer': 'sgd',
-            'lr': 0.4,  # 0.01 for adagrad, 0.5 for sgd
+            'lr': 0.4,
             'batch_size': 64,
         }
 

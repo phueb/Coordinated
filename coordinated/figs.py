@@ -32,7 +32,7 @@ def make_scatter_plot(slot2xy: Dict[str, np.ndarray],
     # plot target locations
     for coordinates in cat_id2coordinate.values():
         x, y = coordinates
-        ax.scatter(x, y, s=8, c='black', zorder=1, marker='v')
+        ax.scatter(x, y, s=16, c='black', zorder=3, marker='v')
 
     # plot embeddings
     for slot, embeddings in slot2xy.items():
@@ -40,9 +40,8 @@ def make_scatter_plot(slot2xy: Dict[str, np.ndarray],
         if exclude_slot_y and slot == 'y':
             continue
         x, y = embeddings[:, 0], embeddings[:, 1]
-        ax.scatter(x, y, label=slot, s=4)
+        ax.scatter(x, y, label=slot, s=4, alpha=0.5)
 
     plt.legend(loc='upper right')
-    print('plotting at step', step)
 
     return fig

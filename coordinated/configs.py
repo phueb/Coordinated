@@ -14,7 +14,8 @@ class Training:
 class Eval:
     verbose = False
     eval_interval = 100
-    plot_interval = 100
+    plot_interval = 50
+    hf_threshold = 10  # must be calibrated against various corpus parameters
 
 
 class Fig:
