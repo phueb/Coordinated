@@ -26,6 +26,6 @@ class Fig:
     dpi = 163 // 2
     line_width = 2
 
-    show_embeddings = 0
+    show_embeddings = 1
     show_hiddens1 = 0
-    show_hiddens2 = 1
+    show_hiddens2 = 0

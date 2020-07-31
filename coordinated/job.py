@@ -184,18 +184,18 @@ def main(param2val=None):
             # compute hiddens2 - last hidden state for complete sequence
             # note:not all possible contexts may be represented in corpus, but close
             hiddens = rnn(torch.cuda.LongTensor(unique_contexts_ending_in_b_all))
-            slot2hiddens2['axb (all sequences)'] = hiddens.detach().cpu().numpy()
-            hiddens = rnn(torch.cuda.LongTensor(unique_contexts_ending_in_b_hf))
-            slot2hiddens2['axb (high-frequency only)'] = hiddens.detach().cpu().numpy()
+            slot2hiddens2['axb'] = hiddens.detach().cpu().numpy()
+            # hiddens = rnn(torch.cuda.LongTensor(unique_contexts_ending_in_b_hf))
+            # slot2hiddens2['axb (high-frequency only)'] = hiddens.detach().cpu().numpy()
 
             # make fig
             fig_e1 = make_scatter_plot(slot2embeddings, 'embeddings', step, cat_id2coordinate)
             fig_h1 = make_scatter_plot(slot2hiddens1, 'hidden states', step, cat_id2coordinate)
             fig_h2 = make_scatter_plot(slot2hiddens2, 'hidden states', step, cat_id2coordinate)
 
-            fig_e1.savefig(save_path / 'embeddings' / f'{step}.png')
-            fig_h1.savefig(save_path / 'hiddens1' / f'{step}.png')
-            fig_h2.savefig(save_path / 'hiddens2' / f'{step}.png')
+            fig_e1.savefig(save_path / 'embeddings' / f'{step:0>6}.png')
+            fig_h1.savefig(save_path / 'hiddens1' / f'{step:0>6}.png')
+            fig_h2.savefig(save_path / 'hiddens2' / f'{step:0>6}.png')
 
             if configs.Fig.show_embeddings:
                 fig_e1.show()
@@ -236,7 +236,7 @@ if __name__ == '__main__':
             'num_types': 128 // 1,  # originally 128
             'starvation': (0.0, 0.0),  # (prob before delay, prob after delay)
             'sample_a': ('super', 'super'),
-            'sample_b': ('super', 'super'),
+            'sample_b': ('item', 'item'),
             'incongruent_a': (0.0, 0.0),  # probability that Ai is category incongruent
             'incongruent_b': (0.0, 0.0),
             'size_a': (1.0, 1.0),  # proportion of set size of A
