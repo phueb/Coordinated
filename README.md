@@ -18,13 +18,13 @@ The last hidden state of A-X-B sequences clearly approach their target locations
  <img src="images/hiddens2_b=item.gif" width="324"> 
 </div>
 
-However, the embeddings of the same network do not inherent the organization that exists at the hidden layer.
+However, the embeddings for items in slot X (orange) - of the same network - do not inherent the (triangular) organization that is learned at the hidden layer.
 <div align="center">
  <img src="images/embeddings_b=item.gif" width="324"> 
 </div>
 
 Only when the mutual information between X and B is zero, 
-do the embeddings inherent the same (triangular) organization that exists at the hidden layer.
+do the embeddings for items in slot X (orange) inherit the same (triangular) organization that exists at the hidden layer.
 
 <div align="center">
  <img src="images/embeddings_b=super.gif" width="324"> 
