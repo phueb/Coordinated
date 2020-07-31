@@ -22,7 +22,7 @@ class Fig:
     title_label_fs = 8
     axis_fs = 12
     leg_fs = 8
-    fig_size = (6, 6)
+    fig_size = (4, 4)
     dpi = 163 // 2
     line_width = 2
 
