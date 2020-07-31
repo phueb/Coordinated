@@ -10,20 +10,21 @@ Execute `main() in coordinated.job`
 
 ## Example Simulations
 
-When mutual information between X and B slot is maximal, 
-categorization problem is solved, as seen below,
+When the mutual information between the distribution of items in slot X and B is maximal, 
+the categorization problem is easily solved. 
+The last hidden state of A-X-B sequences clearly approach their target locations (black triangles, one for each category).
 
 <div align="center">
  <img src="images/hiddens2_b=item.gif" width="324"> 
 </div>
 
-but the embeddings do not inherent the same organization, as shown below.
+However, the embeddings of the same network do not inherent the organization that exists at the hidden layer.
 <div align="center">
  <img src="images/embeddings_b=item.gif" width="324"> 
 </div>
 
 Only when the mutual information between X and B is zero, 
-do the embeddings inherent the same 2D organization that exists at the hidden layer, as shown below.
+do the embeddings inherent the same (triangular) organization that exists at the hidden layer.
 
 <div align="center">
  <img src="images/embeddings_b=super.gif" width="324"> 
