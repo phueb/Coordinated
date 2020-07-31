@@ -20,8 +20,7 @@ The last hidden state of A-X-B sequences clearly approach their target locations
 
 However, the embeddings for items in slot X (orange) - of the same network - do not inherent the (triangular) organization that is learned at the hidden layer.
 Notice, that the orange clusters are not equidistant from one another, as they would be had they inherited the triangular organization.
-This is important, because the organization of the three clusters along a line implies that the category represented by the middle cluster is more closely related to its neighbors than either neighbor is to the other.
-The triangular organization (exemplified by the three black triangles) is the only organization that is agnostic to such inter-category relationships. 
+
 <div align="center">
  <img src="images/embeddings_b=item.gif" width="324"> 
 </div>
@@ -32,6 +31,10 @@ do the embeddings for items in slot X (orange) inherit the same (triangular) org
 <div align="center">
  <img src="images/embeddings_b=super.gif" width="324"> 
 </div>
+
+### Why is this important ? 
+This is important, because the organization of three clusters along a line implies that the category represented by the middle cluster is more closely related to its neighbors than either neighbor is to the other.
+The triangular organization (exemplified by the three black triangles) is the only organization that is agnostic to such inter-category relationships. 
 
 ## Compatibility
 
