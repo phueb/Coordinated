@@ -14,18 +14,19 @@ When mutual information between X and B slot is maximal,
 categorization problem is solved, as seen below,
 
 <div align="center">
- <img src="images/hiddens2_b=item.gif" width="250"> 
+ <img src="images/hiddens2_b=item.gif" width="324"> 
 </div>
 
-but the embeddings do not cluster as clearly, as shown below,
+but the embeddings do not inherent the same organization, as shown below.
 <div align="center">
- <img src="images/embeddings_b=item.gif" width="250"> 
+ <img src="images/embeddings_b=item.gif" width="324"> 
 </div>
 
-compared to when mutual information between X and B is zero, as shown below.
+Only when the mutual information between X and B is zero, 
+do the embeddings inherent the same 2D organization that exists at the hidden layer, as shown below.
 
 <div align="center">
- <img src="images/embeddings_b=super.gif" width="250"> 
+ <img src="images/embeddings_b=super.gif" width="324"> 
 </div>
 
 ## Compatibility
