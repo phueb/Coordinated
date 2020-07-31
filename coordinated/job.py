@@ -230,7 +230,7 @@ if __name__ == '__main__':
             'num_types': 128 // 1,  # originally 128
             'starvation': (0.0, 0.0),  # (prob before delay, prob after delay)
             'sample_a': ('super', 'super'),
-            'sample_b': ('item', 'item'),
+            'sample_b': ('super', 'super'),
             'incongruent_a': (0.0, 0.0),  # probability that Ai is category incongruent
             'incongruent_b': (0.0, 0.0),
             'size_a': (1.0, 1.0),  # proportion of set size of A
