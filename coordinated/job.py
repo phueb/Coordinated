@@ -49,7 +49,7 @@ class Params(object):
 def main(param2val=None):
 
     if param2val is None:  # if running in IDE
-        save_path = Path('saves')
+        save_path = configs.Dirs.root / 'saved_figures'
     else:
         save_path = Path(param2val['save_path'])
 
@@ -187,6 +187,10 @@ def main(param2val=None):
             fig_h1 = make_scatter_plot(slot2hiddens1, 'hidden states', step, cat_id2coordinate)
             fig_h2 = make_scatter_plot(slot2hiddens2, 'hidden states', step, cat_id2coordinate)
 
+            # save figures - save_path must always be created when using Ludwig
+            (save_path / 'embeddings').mkdir(parents=True, exist_ok=True)
+            (save_path / 'hiddens1').mkdir(parents=True, exist_ok=True)
+            (save_path / 'hiddens2').mkdir(parents=True, exist_ok=True)
             fig_e1.savefig(save_path / 'embeddings' / f'{step:0>6}.png')
             fig_h1.savefig(save_path / 'hiddens1' / f'{step:0>6}.png')
             fig_h2.savefig(save_path / 'hiddens2' / f'{step:0>6}.png')
@@ -217,9 +221,9 @@ def main(param2val=None):
 
 
 if __name__ == '__main__':
-    (Path('saves') / 'embeddings').mkdir(parents=True, exist_ok=True)
-    (Path('saves') / 'hiddens1').mkdir(parents=True, exist_ok=True)
-    (Path('saves') / 'hiddens2').mkdir(parents=True, exist_ok=True)
+    (Path('saved_figures') / 'embeddings').mkdir(parents=True, exist_ok=True)
+    (Path('saved_figures') / 'hiddens1').mkdir(parents=True, exist_ok=True)
+    (Path('saved_figures') / 'hiddens2').mkdir(parents=True, exist_ok=True)
 
     param2val_ide = {
             # rnn
