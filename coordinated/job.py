@@ -225,6 +225,9 @@ if __name__ == '__main__':
     (Path('saved_figures') / 'hiddens1').mkdir(parents=True, exist_ok=True)
     (Path('saved_figures') / 'hiddens2').mkdir(parents=True, exist_ok=True)
 
+    # TODO make separate directories for different param configurations so
+    #  that previously generated figures are not overwritten when main() is called  in IDE
+
     param2val_ide = {
             # rnn
             'flavor': 'srn',
