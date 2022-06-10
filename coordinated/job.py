@@ -1,4 +1,3 @@
-import attr
 import pandas as pd
 import numpy as np
 import torch
@@ -7,59 +6,19 @@ from pathlib import Path
 from preppy import SlidingPrep
 
 from coordinated import configs
+from coordinated.params import Params, param2default
 from coordinated.rnn import RNN
 from coordinated.corpus import Corpus
 from coordinated.figs import make_scatter_plot
 
 
-@attr.s
-class Params(object):
-    # rnn
-    flavor = attr.ib(validator=attr.validators.instance_of(str))
-    # toy corpus
-    doc_size = attr.ib(validator=attr.validators.instance_of(int))
-    delay = attr.ib(validator=attr.validators.instance_of(int))
-    num_types = attr.ib(validator=attr.validators.instance_of(int))
-    starvation = attr.ib(validator=attr.validators.instance_of(tuple))
-    sample_b = attr.ib(validator=attr.validators.instance_of(tuple))
-    sample_a = attr.ib(validator=attr.validators.instance_of(tuple))
-    incongruent_a = attr.ib(validator=attr.validators.instance_of(tuple))
-    incongruent_b = attr.ib(validator=attr.validators.instance_of(tuple))
-    size_a = attr.ib(validator=attr.validators.instance_of(tuple))
-    size_b = attr.ib(validator=attr.validators.instance_of(tuple))
-    drop_a = attr.ib(validator=attr.validators.instance_of(tuple))
-    drop_b = attr.ib(validator=attr.validators.instance_of(tuple))
-    # training
-    optimizer = attr.ib(validator=attr.validators.instance_of(str))
-    batch_size = attr.ib(validator=attr.validators.instance_of(int))
-    lr = attr.ib(validator=attr.validators.instance_of(float))
-
-    @classmethod
-    def from_param2val(cls, param2val):
-        """
-        instantiate class.
-        exclude keys from param2val which are added by Ludwig.
-        they are relevant to job submission only.
-        """
-        kwargs = {k: v for k, v in param2val.items()
-                  if k not in ['job_name', 'param_name', 'project_path', 'save_path']}
-        return cls(**kwargs)
-
-
-def main(param2val=None):
-
-    if param2val is None:  # if running in IDE
-        save_path = configs.Dirs.root / 'saved_figures'
-    else:
-        save_path = Path(param2val['save_path'])
-
-    # this allows running main() directly in IDE instead of terminal which does not show figures by default
-    if param2val is None:
-        param2val = param2val_ide
+def main(param2val):
 
     # params
     params = Params.from_param2val(param2val)
-    print(params, flush=True)
+    print(params)
+
+    save_path = Path(param2val['save_path'])
 
     # create toy input
     corpus = Corpus(doc_size=params.doc_size,
@@ -76,7 +35,7 @@ def main(param2val=None):
                     drop_a=params.drop_a,
                     drop_b=params.drop_b,
                     )
-    prep = SlidingPrep([corpus.doc],
+    prep = SlidingPrep(docs=[corpus.doc],
                        reverse=False,
                        num_types=None,  # None ensures that no OOV symbol is inserted and all types are represented
                        slide_size=params.batch_size,
@@ -89,10 +48,6 @@ def main(param2val=None):
     bool_ids = np.isin(all_contexts[:, -1], b_ids)
     all_contexts_ending_in_b = all_contexts[bool_ids]
     unique_contexts_ending_in_b_all, counts = np.unique(all_contexts_ending_in_b, axis=0, return_counts=True)
-    print('stats about window counts')
-    print(counts.min())
-    print(counts.mean())
-    print(counts.max())
     print(f'num sequences all={len(unique_contexts_ending_in_b_all):,}')
 
     # define 3 locations in 2d space equidistant from one another and from origin
@@ -221,33 +176,10 @@ def main(param2val=None):
 
 
 if __name__ == '__main__':
-    (Path('saved_figures') / 'embeddings').mkdir(parents=True, exist_ok=True)
-    (Path('saved_figures') / 'hiddens1').mkdir(parents=True, exist_ok=True)
-    (Path('saved_figures') / 'hiddens2').mkdir(parents=True, exist_ok=True)
+    # run main() directly in IDE instead of terminal to take advantage of IDE plot window.
 
-    # TODO make separate directories for different param configurations so
-    #  that previously generated figures are not overwritten when main() is called  in IDE
+    param2val = param2default.copy()
+    param2val['save_path'] = configs.Dirs.root / 'saved_figures'
+    # modify params here
 
-    param2val_ide = {
-            # rnn
-            'flavor': 'srn',
-            # toy corpus
-            'doc_size': 400_000,
-            'delay': 200_000,
-            'num_types': 128 // 1,  # originally 128
-            'starvation': (0.0, 0.0),  # (prob before delay, prob after delay)
-            'sample_a': ('super', 'super'),
-            'sample_b': ('super', 'super'),
-            'incongruent_a': (0.0, 0.0),  # probability that Ai is category incongruent
-            'incongruent_b': (0.0, 0.0),
-            'size_a': (1.0, 1.0),  # proportion of set size of A
-            'size_b': (1.0, 1.0),
-            'drop_a': (0.0, 0.0),
-            'drop_b': (0.0, 0.0),
-            # training
-            'optimizer': 'sgd',
-            'lr': 0.05,
-            'batch_size': 64,
-        }
-
-    main()
+    main(param2val)
