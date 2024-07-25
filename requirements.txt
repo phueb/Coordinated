@@ -1,6 +1,6 @@
 numpy
 matplotlib
-torch==1.4.0
+torch==2.2.0
 cached_property
 pandas
 https://github.com/phueb/Preppy/archive/v3.1.1.tar.gz
